@@ -33,54 +33,41 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
 
         return activation(ret)  # activation
 
-# Experimental sparse attention head (for running on datasets such as Pubmed)
-# N.B. Because of limitations of current TF implementation, will work _only_ if batch_size = 1!
-def sp_attn_head(seq, out_sz, adj_mat, activation, nb_nodes, in_drop=0.0, coef_drop=0.0, residual=False):
-    with tf.name_scope('sp_attn'):
+# input dim:
+# seq: [batch_size, nb_nodes, nb_features, nb_slots]
+# out: [batch_size, nb_nodes, nb_newfeatures, nb_newslots]
+def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=0.0, residual=False):
+    with tf.name_scope('my_attn'):
         if in_drop != 0.0:
             seq = tf.nn.dropout(seq, 1.0 - in_drop)
 
-        seq_fts = tf.layers.conv1d(seq, out_sz, 1, use_bias=False)
+        batch_size, nb_nodes, nb_features, nb_slots = seq.get_shape()
+        seq_tmp = tf.transpose(seq,perm=[0,1,3,2])
+        seq_tmp = tf.reshape(seq_tmp, shape=[-1,nb_nodes*nb_slots,nb_features])
 
+        seq_fts = tf.layers.conv1d(seq_tmp, out_sz, 1, use_bias=False)
+
+        seq_fts = tf.reshape(seq_fts, shape=[-1, nb_nodes, nb_slots, out_sz])
+        seq_fts = tf.transpose(seq_fts, perm=[0,2,1,3])
+        reweight_mat = tf.transpose(reweight_mat,perm=[0,3,1,2])  # [batch_size, nb_slots, nb_nodes, nb_nodes]
         # simplest self-attention possible
-        f_1 = tf.layers.conv1d(seq_fts, 1, 1)
-        f_2 = tf.layers.conv1d(seq_fts, 1, 1)
-        
-        f_1 = tf.reshape(f_1, (nb_nodes, 1))
-        f_2 = tf.reshape(f_2, (nb_nodes, 1))
 
-        f_1 = adj_mat*f_1
-        f_2 = adj_mat * tf.transpose(f_2, [1,0])
+        vals = tf.matmul(reweight_mat, seq_fts)
+        vals = tf.contrib.layers.bias_add(vals)
+        vals = tf.transpose(vals, perm=[0,2,3,1])
+        vals =activation(vals) # [batch_size, nb_nodes, nb_filters, nb_slots]
 
-        logits = tf.sparse_add(f_1, f_2)
-        lrelu = tf.SparseTensor(indices=logits.indices, 
-                values=tf.nn.leaky_relu(logits.values), 
-                dense_shape=logits.dense_shape)
-        coefs = tf.sparse_softmax(lrelu)
-
-        if coef_drop != 0.0:
-            coefs = tf.SparseTensor(indices=coefs.indices,
-                    values=tf.nn.dropout(coefs.values, 1.0 - coef_drop),
-                    dense_shape=coefs.dense_shape)
-        if in_drop != 0.0:
-            seq_fts = tf.nn.dropout(seq_fts, 1.0 - in_drop)
-
-        # As tf.sparse_tensor_dense_matmul expects its arguments to have rank-2,
-        # here we make an assumption that our input is of batch size 1, and reshape appropriately.
-        # The method will fail in all other cases!
-        coefs = tf.sparse_reshape(coefs, [nb_nodes, nb_nodes])
-        seq_fts = tf.squeeze(seq_fts)
-        vals = tf.sparse_tensor_dense_matmul(coefs, seq_fts)
-        vals = tf.expand_dims(vals, axis=0)
-        vals.set_shape([1, nb_nodes, out_sz])
-        ret = tf.contrib.layers.bias_add(vals)
+        ret = tf.layers.conv2d(vals, nb_slots, 1, activation=activation)
+        ret = tf.nn.softmax(ret, axis=1)
 
         # residual connection
         if residual:
-            if seq.shape[-1] != ret.shape[-1]:
-                ret = ret + conv1d(seq, ret.shape[-1], 1) # activation
-            else:
-                seq_fts = ret + seq
+            # if seq.shape[-1] != ret.shape[-1]:
+            #     ret = ret + conv1d(seq, ret.shape[-1], 1) # activation
+            # else:
+            #     seq_fts = ret + seq
+            ret = tf.concat([ret,seq],axis=2)
 
-        return activation(ret)  # activation
+        return  ret# activation
+
 

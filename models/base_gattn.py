@@ -1,11 +1,13 @@
 import tensorflow as tf
 
 class BaseGAttN:
-    def loss(logits, labels, nb_classes, class_weights):
-        sample_wts = tf.reduce_sum(tf.multiply(tf.one_hot(labels, nb_classes), class_weights), axis=-1)
-        xentropy = tf.multiply(tf.nn.sparse_softmax_cross_entropy_with_logits(
-                labels=labels, logits=logits), sample_wts)
-        return tf.reduce_mean(xentropy, name='xentropy_mean')
+    def loss(logits, labels):
+        # sample_wts = tf.reduce_sum(tf.multiply(tf.one_hot(labels, nb_classes), class_weights), axis=-1)
+        # xentropy = tf.multiply(tf.nn.sparse_softmax_cross_entropy_with_logits(
+        #         labels=labels, logits=logits), sample_wts)
+        # return tf.reduce_mean(xentropy, name='xentropy_mean')
+        Re_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+        return tf.reduce_mean(Re_loss, axis=0)
 
     def training(loss, lr, l2_coef):
         # weight decay
@@ -20,6 +22,11 @@ class BaseGAttN:
         train_op = opt.minimize(loss+lossL2)
         
         return train_op
+
+    def accuracy(preds, labels):
+        correct_prediction = tf.equal(tf.argmax(preds, 1), tf.argmax(labels, 1))
+        accuracy_all = tf.cast(correct_prediction, tf.float32)
+        return tf.reduce_mean(accuracy_all)
 
     def preshape(logits, labels, nb_classes):
         new_sh_lab = [-1]
@@ -36,32 +43,32 @@ class BaseGAttN:
 # Adapted from tkipf/gcn #
 ##########################
 
-    def masked_softmax_cross_entropy(logits, labels, mask):
-        """Softmax cross-entropy loss with masking."""
-        loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
-        mask = tf.cast(mask, dtype=tf.float32)
-        mask /= tf.reduce_mean(mask)
-        loss *= mask
-        return tf.reduce_mean(loss)
+    # def masked_softmax_cross_entropy(logits, labels, mask):
+    #     """Softmax cross-entropy loss with masking."""
+    #     loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+    #     mask = tf.cast(mask, dtype=tf.float32)
+    #     mask /= tf.reduce_mean(mask)
+    #     loss *= mask
+    #     return tf.reduce_mean(loss)
+    #
+    # def masked_sigmoid_cross_entropy(logits, labels, mask):
+    #     """Softmax cross-entropy loss with masking."""
+    #     labels = tf.cast(labels, dtype=tf.float32)
+    #     loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels)
+    #     loss=tf.reduce_mean(loss,axis=1)
+    #     mask = tf.cast(mask, dtype=tf.float32)
+    #     mask /= tf.reduce_mean(mask)
+    #     loss *= mask
+    #     return tf.reduce_mean(loss)
 
-    def masked_sigmoid_cross_entropy(logits, labels, mask):
-        """Softmax cross-entropy loss with masking."""
-        labels = tf.cast(labels, dtype=tf.float32)
-        loss = tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels)
-        loss=tf.reduce_mean(loss,axis=1)
-        mask = tf.cast(mask, dtype=tf.float32)
-        mask /= tf.reduce_mean(mask)
-        loss *= mask
-        return tf.reduce_mean(loss)
-
-    def masked_accuracy(logits, labels, mask):
-        """Accuracy with masking."""
-        correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
-        accuracy_all = tf.cast(correct_prediction, tf.float32)
-        mask = tf.cast(mask, dtype=tf.float32)
-        mask /= tf.reduce_mean(mask)
-        accuracy_all *= mask
-        return tf.reduce_mean(accuracy_all)
+    # def masked_accuracy(logits, labels, mask):
+    #     """Accuracy with masking."""
+    #     correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
+    #     accuracy_all = tf.cast(correct_prediction, tf.float32)
+    #     mask = tf.cast(mask, dtype=tf.float32)
+    #     mask /= tf.reduce_mean(mask)
+    #     accuracy_all *= mask
+    #     return tf.reduce_mean(accuracy_all)
 
     def micro_f1(logits, labels, mask):
         """Accuracy with masking."""
