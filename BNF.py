@@ -8,7 +8,8 @@ import Data_processing
 
 checkpt_file = 'pre_trained/cora/mod_cora.ckpt'
 
-dataset = 'Autism'
+dataset = 'Schiz'
+
 
 # training params
 batch_size = 100
@@ -16,10 +17,10 @@ nb_epochs = 10000
 patience = 50
 lr = 0.01  # learning rate
 l2_coef = 0.0005  # weight decay
-hid_units = [16,16,16] # numbers of hidden units per each attention head in each layer
-n_heads = [2, 2, 2] # additional entry for the output layer
-residual = True
-nonlinearity = tf.nn.elu
+hid_units = [16,32,32,16] # numbers of hidden units per each attention head in each layer
+n_heads = [2, 2, 2,2] # additional entry for the output layer
+residual = False
+nonlinearity = tf.nn.relu
 model = GAT_BNF
 
 print('Dataset: ' + dataset)

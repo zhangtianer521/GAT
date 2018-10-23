@@ -43,11 +43,11 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=
 
         batch_size, nb_nodes, nb_features, nb_slots = seq.get_shape()
         seq_tmp = tf.transpose(seq,perm=[0,1,3,2])
-        seq_tmp = tf.reshape(seq_tmp, shape=[-1,nb_nodes*nb_slots,nb_features])
+        # seq_tmp = tf.reshape(seq_tmp, shape=[-1,nb_nodes*nb_slots,nb_features])
 
-        seq_fts = tf.layers.conv1d(seq_tmp, out_sz, 1, use_bias=False)
+        seq_fts = tf.layers.conv2d(seq_tmp, out_sz, 1, use_bias=False)
 
-        seq_fts = tf.reshape(seq_fts, shape=[-1, nb_nodes, nb_slots, out_sz])
+        # seq_fts = tf.reshape(seq_fts, shape=[-1, nb_nodes, nb_slots, out_sz])
         seq_fts = tf.transpose(seq_fts, perm=[0,2,1,3])
         reweight_mat = tf.transpose(reweight_mat,perm=[0,3,1,2])  # [batch_size, nb_slots, nb_nodes, nb_nodes]
         # simplest self-attention possible
@@ -58,7 +58,8 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=
         vals =activation(vals) # [batch_size, nb_nodes, nb_filters, nb_slots]
 
         ret = tf.layers.conv2d(vals, nb_slots, 1, activation=activation)
-        ret = tf.nn.softmax(ret, axis=1)
+        # ret = tf.nn.softmax(ret, axis=1)
+        ret = tf.nn.l2_normalize(ret,axis=1)
 
         # residual connection
         if residual:
@@ -69,5 +70,4 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=
             ret = tf.concat([ret,seq],axis=2)
 
         return  ret# activation
-
 
