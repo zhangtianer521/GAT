@@ -14,12 +14,12 @@ dataset = 'Schiz'
 # training params
 batch_size = 100
 nb_epochs = 10000
-patience = 200
-lr = 0.05  # learning rate
-l2_coef = 0.0005  # weight decay
-hid_units = [16,32,32,16] # numbers of hidden units per each attention head in each layer
-n_heads = [2, 2, 2,2] # additional entry for the output layer
-residual = False
+patience = 100
+lr = 0.01  # learning rate
+l2_coef = 0.005  # weight decay
+hid_units = [32,32,32,32,16,16] # numbers of hidden units per each attention head in each layer
+n_heads = [1, 1, 1,1,1,1] # additional entry for the output layer
+residual = True
 nonlinearity = tf.nn.relu
 model = GAT_BNF
 
@@ -43,7 +43,7 @@ train_fmri_net, train_adj, train_labels, test_fmri_net, test_adj, test_labels = 
 nb_nodes = train_adj.shape[1]
 ft_size = 1
 nb_classes = train_labels.shape[1]
-nb_slot = 10
+nb_slot = 20
 
 batch_size = train_adj.shape[0]
 
@@ -73,6 +73,7 @@ with tf.Graph().as_default():
         # msk_in = tf.placeholder(dtype=tf.int32, shape=(batch_size, nb_nodes))
         ffd_drop = tf.placeholder(dtype=tf.float32, shape=())
         is_train = tf.placeholder(dtype=tf.bool, shape=())
+        global_step = tf.Variable(0,trainable=False)
 
     logits, prediction = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
                                 net_mat=bias_in,
@@ -88,7 +89,7 @@ with tf.Graph().as_default():
     loss = model.loss(logits, lbl_in)
     accuracy = model.accuracy(logits, lbl_in)
 
-    train_op = model.training(loss, lr, l2_coef)
+    train_op = model.training(loss, lr, l2_coef, global_step)
 
     saver = tf.train.Saver()
 

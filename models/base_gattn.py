@@ -9,14 +9,15 @@ class BaseGAttN:
         Re_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
         return tf.reduce_mean(Re_loss, axis=0)
 
-    def training(loss, lr, l2_coef):
+    def training(loss, lr, l2_coef, global_step):
         # weight decay
         vars = tf.trainable_variables()
         lossL2 = tf.add_n([tf.nn.l2_loss(v) for v in vars if v.name not
                            in ['bias', 'gamma', 'b', 'g', 'beta']]) * l2_coef
 
         # optimizer
-        opt = tf.train.AdamOptimizer(learning_rate=lr)
+        current_lr = tf.train.exponential_decay(lr,global_step,10, 0.99, staircase=True)
+        opt = tf.train.AdamOptimizer(learning_rate=current_lr)
 
         # training op
         train_op = opt.minimize(loss+lossL2)

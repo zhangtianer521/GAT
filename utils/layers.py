@@ -78,6 +78,6 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, residual=F
 def sparsity_BNF(net, out_sz, residual=False):
     with tf.name_scope('my_sparsity_BNF'):
         net_tmp = tf.expand_dims(net, axis=-1)
-        net_tmp= tf.layers.conv2d(net_tmp,out_sz,1,activation=tf.nn.tanh,use_bias=True)
+        net_tmp= tf.layers.conv2d(net_tmp,out_sz,1,activation=tf.nn.tanh,use_bias=False)
         net_out = tf.multiply(tf.sign(net_tmp)+1,1)
         return net_out
