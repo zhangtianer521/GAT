@@ -31,7 +31,7 @@ def data_reorder(Datadir):
             np.fill_diagonal(DTI_connectivity,1)
             # DTI_connectivity = DTI_connectivity / (DTI_connectivity.sum(axis=1).transpose())
             # DTI_connectivity = (DTI_connectivity.transpose() + DTI_connectivity) / 2
-            DTI_connectivity = sparsity(DTI_connectivity,sparsity_levels)
+            # DTI_connectivity = sparsity(DTI_connectivity,sparsity_levels)
             DTI_connects.append(DTI_connectivity)
 
             fmri_signal = np.load(Datadir + file + '.npy')
@@ -59,10 +59,10 @@ def load_data(Datadir, labelscsv):  ### labels: a cvs file
 
     graphs = np.zeros(DTI_net.shape)
 
-    for i in range(graphs.shape[3]):
-        graphs[...,i] = np.multiply(fmri_net,DTI_net[...,i])
+    # for i in range(graphs.shape[3]):
+    #     graphs[...,i] = np.multiply(fmri_net,DTI_net[...,i])
 
-    features = np.ones((graphs.shape[0],graphs.shape[1],1, graphs.shape[3]))
+    # features = np.ones((graphs.shape[0],graphs.shape[1],1, graphs.shape[3]))
 
     #normalize features
     # for ind in range(features.shape[0]):
@@ -81,7 +81,7 @@ def load_data(Datadir, labelscsv):  ### labels: a cvs file
             labels.append(row[1])
 
     # generate training and testing samples
-    train_features, test_features, train_labels, test_labels, train_graph, test_graph = train_test_split(features,labels,graphs,test_size=0.3)
+    train_fmri_net, test_fmri_net, train_labels, test_labels, train_graph, test_graph = train_test_split(fmri_net,labels,graphs,test_size=0.3)
 
 
     # labels = np.asarray(labels)
@@ -95,7 +95,7 @@ def load_data(Datadir, labelscsv):  ### labels: a cvs file
     ### features: 3D array, [#subjects, #nodes, #feature_per_node]
     ### graph: 2D array
     ### labels: 1D list
-    return train_features, train_graph, one_hot(train_labels), test_features, test_graph, one_hot(test_labels)
+    return train_fmri_net, train_graph, one_hot(train_labels), test_fmri_net, test_graph, one_hot(test_labels)
 
 def sparsity(net, sparsity_level):
     net_vec = np.matrix.flatten(net)
