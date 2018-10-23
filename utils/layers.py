@@ -36,8 +36,8 @@ def attn_head(seq, out_sz, bias_mat, activation, in_drop=0.0, coef_drop=0.0, res
 # input dim:
 # seq: [batch_size, nb_nodes, nb_features, nb_slots]
 # out: [batch_size, nb_nodes, nb_newfeatures, nb_newslots]
-def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=0.0, residual=False):
-    with tf.name_scope('my_attn'):
+def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, residual=False):
+    with tf.name_scope('my_attn_BNF'):
         if in_drop != 0.0:
             seq = tf.nn.dropout(seq, 1.0 - in_drop)
 
@@ -71,3 +71,13 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, coef_drop=
 
         return  ret# activation
 
+
+# input dim:
+# net: [batch_size, nb_nodes, nb_nodes]
+# out: [batch_size, nb_nodes, nb_nodes, nb_slots]
+def sparsity_BNF(net, out_sz, residual=False):
+    with tf.name_scope('my_sparsity_BNF'):
+        net_tmp = tf.expand_dims(net, axis=-1)
+        net_tmp= tf.layers.conv2d(net_tmp,out_sz,1,activation=tf.nn.tanh,use_bias=True)
+        net_out = tf.multiply(tf.sign(net_tmp)+1,1)
+        return net_out
