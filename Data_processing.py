@@ -38,6 +38,7 @@ def data_reorder(Datadir):
             estimator = connectome.ConnectivityMeasure()
             fmri_net = estimator.fit_transform([fmri_signal])[0]
             fmri_net = np.abs(fmri_net)
+            fmri_net = normalize_mat(fmri_net)
             fmri_nets.append(fmri_net)
 
         ########################
@@ -113,6 +114,12 @@ def sparsity(net, sparsity_level):
 def one_hot(labels):
     s = pd.Series(labels)
     return pd.get_dummies(s)
+
+def normalize_mat(net):
+    flatten = np.matrix.flatten(net)
+    sort = np.sort(flatten)
+    net = net/sort[-1]*1
+    return net
 
 
 def creat_csv_Autism(idtxt, allcsvlist,outcsv):
