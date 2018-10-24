@@ -39,6 +39,8 @@ class GAT_BNF(BaseGAttN):
         sparsity_mat = layers.sparsity_BNF(net_mat,nb_slots)
         fmri_mat = tf.expand_dims(fmri_net,3)
         reweight_mat = tf.multiply(sparsity_mat,fmri_mat)
+        # reweight_mat = tf.contrib.layers.bias_add(reweight_mat)
+
         jump_out = []
         attns = []
         for _ in range(n_heads[0]):

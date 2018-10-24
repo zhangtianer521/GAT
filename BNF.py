@@ -13,8 +13,8 @@ dataset = 'Schiz'
 
 # training params
 batch_size = 100
-nb_epochs = 10000
-patience = 100
+nb_epochs = 200
+patience = 20
 lr = 0.01  # learning rate
 l2_coef = 0.005  # weight decay
 hid_units = [32,32,32,32,16,16] # numbers of hidden units per each attention head in each layer
@@ -22,6 +22,7 @@ n_heads = [1, 1, 1,1,1,1] # additional entry for the output layer
 residual = True
 nonlinearity = tf.nn.relu
 model = GAT_BNF
+augmentation = 500
 
 print('Dataset: ' + dataset)
 print('----- Opt. hyperparams -----')
@@ -35,17 +36,31 @@ print('residual: ' + str(residual))
 print('nonlinearity: ' + str(nonlinearity))
 print('model: ' + str(model))
 
-train_fmri_net, train_adj, train_labels, test_fmri_net, test_adj, test_labels = \
-    Data_processing.load_data('Data_BNF/'+dataset+'/','Data_BNF/'+dataset+'/labels.csv')
-# adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = process.load_data(dataset)
-# train_features, spars = process.preprocess_features(train_features)
+tr_fmri_net, tr_adj, tr_labels, val_fmri_net, val_adj, val_labels, test_fmri_net, test_adj, test_labels = \
+    Data_processing.load_data('Data_BNF/'+dataset+'/','Data_BNF/'+dataset+'/labels.csv', augmentation)
 
-nb_nodes = train_adj.shape[1]
+# tr_fmri_net, tr_adj, tr_labels, val_fmri_net, val_adj, val_labels, test_fmri_net, test_adj, test_labels = \
+#     Data_processing.load_sorted_data('Data_BNF/'+dataset+'/sort_data.pkl')
+
+train_size = tr_fmri_net.shape[0]
+nb_nodes = tr_adj.shape[1]
 ft_size = 1
-nb_classes = train_labels.shape[1]
 nb_slot = 20
+nb_classes = 2
 
-batch_size = train_adj.shape[0]
+tr_labels = Data_processing.one_hot(tr_labels)
+val_labels = Data_processing.one_hot(val_labels)
+test_labels = Data_processing.one_hot(test_labels)
+
+tr_features = np.ones((tr_adj.shape[0],nb_nodes,ft_size, nb_slot))
+val_features = np.ones((val_adj.shape[0],nb_nodes,ft_size, nb_slot))
+test_features = np.ones((test_adj.shape[0], nb_nodes, ft_size, nb_slot))
+
+
+
+
+
+# batch_size = train_adj.shape[0]
 
 # adj = adj.todense()
 
@@ -80,8 +95,6 @@ with tf.Graph().as_default():
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
 
-    train_features = np.ones((batch_size,nb_nodes,ft_size, nb_slot))
-    test_features = np.ones((test_adj.shape[0], nb_nodes, ft_size, nb_slot))
 
     # log_resh = tf.reshape(logits, [-1, nb_classes])
     # lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
@@ -109,16 +122,16 @@ with tf.Graph().as_default():
 
         for epoch in range(nb_epochs):
             tr_step = 0
-            tr_size = train_features.shape[0]
+            tr_size = tr_features.shape[0]
 
             while tr_step * batch_size < tr_size:
                 _, loss_value_tr, acc_tr, logits_val = sess.run([train_op, loss, accuracy, logits],
 
                     feed_dict={
-                        ftr_in: train_features[tr_step*batch_size:(tr_step+1)*batch_size],
-                        bias_in: train_adj[tr_step*batch_size:(tr_step+1)*batch_size],
-                        lbl_in: train_labels[tr_step*batch_size:(tr_step+1)*batch_size],
-                        fmri_net: train_fmri_net[tr_step*batch_size:(tr_step+1)*batch_size],
+                        ftr_in: tr_features[tr_step*batch_size:(tr_step+1)*batch_size],
+                        bias_in: tr_adj[tr_step*batch_size:(tr_step+1)*batch_size],
+                        lbl_in: tr_labels[tr_step*batch_size:(tr_step+1)*batch_size],
+                        fmri_net: tr_fmri_net[tr_step*batch_size:(tr_step+1)*batch_size],
                         # msk_in: train_mask[tr_step*batch_size:(tr_step+1)*batch_size],
                         is_train: True})
                 train_loss_avg += loss_value_tr
@@ -128,15 +141,15 @@ with tf.Graph().as_default():
                 # print('Logit value is {}, ------------------------------'.format(logits_val))
 
             vl_step = 0
-            vl_size = test_features.shape[0]
+            vl_size = val_features.shape[0]
 
             while vl_step * batch_size < vl_size:
                 loss_value_vl, acc_vl = sess.run([loss, accuracy],
                     feed_dict={
-                        ftr_in: test_features[vl_step*batch_size:(vl_step+1)*batch_size],
-                        bias_in: test_adj[vl_step*batch_size:(vl_step+1)*batch_size],
-                        lbl_in: test_labels[vl_step*batch_size:(vl_step+1)*batch_size],
-                        fmri_net: test_fmri_net[vl_step*batch_size:(vl_step+1)*batch_size],
+                        ftr_in: val_features[vl_step*batch_size:(vl_step+1)*batch_size],
+                        bias_in: val_adj[vl_step*batch_size:(vl_step+1)*batch_size],
+                        lbl_in: val_labels[vl_step*batch_size:(vl_step+1)*batch_size],
+                        fmri_net: val_fmri_net[vl_step*batch_size:(vl_step+1)*batch_size],
                         # msk_in: val_mask[vl_step*batch_size:(vl_step+1)*batch_size],
                         is_train: False})
                 val_loss_avg += loss_value_vl
@@ -169,24 +182,24 @@ with tf.Graph().as_default():
 
         saver.restore(sess, checkpt_file)
 
-        # ts_size = features.shape[0]
-        # ts_step = 0
-        # ts_loss = 0.0
-        # ts_acc = 0.0
-        #
-        # while ts_step * batch_size < ts_size:
-        #     loss_value_ts, acc_ts = sess.run([loss, accuracy],
-        #         feed_dict={
-        #             ftr_in: features[ts_step*batch_size:(ts_step+1)*batch_size],
-        #             bias_in: biases[ts_step*batch_size:(ts_step+1)*batch_size],
-        #             lbl_in: y_test[ts_step*batch_size:(ts_step+1)*batch_size],
-        #             msk_in: test_mask[ts_step*batch_size:(ts_step+1)*batch_size],
-        #             is_train: False,
-        #             attn_drop: 0.0, ffd_drop: 0.0})
-        #     ts_loss += loss_value_ts
-        #     ts_acc += acc_ts
-        #     ts_step += 1
-        #
-        # print('Test loss:', ts_loss/ts_step, '; Test accuracy:', ts_acc/ts_step)
+        ts_size = test_features.shape[0]
+        ts_step = 0
+        ts_loss = 0.0
+        ts_acc = 0.0
+
+        while ts_step * batch_size < ts_size:
+            loss_value_ts, acc_ts = sess.run([loss, accuracy],
+                feed_dict={
+                    ftr_in: test_features[ts_step*batch_size:(ts_step+1)*batch_size],
+                    bias_in: test_adj[ts_step*batch_size:(ts_step+1)*batch_size],
+                    lbl_in: test_labels[ts_step*batch_size:(ts_step+1)*batch_size],
+                    fmri_net: test_fmri_net[ts_step*batch_size:(ts_step+1)*batch_size],
+                    # msk_in: test_mask[ts_step*batch_size:(ts_step+1)*batch_size],
+                    is_train: False})
+            ts_loss += loss_value_ts
+            ts_acc += acc_ts
+            ts_step += 1
+
+        print('Test loss:', ts_loss/ts_step, '; Test accuracy:', ts_acc/ts_step)
 
         sess.close()
