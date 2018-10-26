@@ -43,9 +43,9 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, residual=F
 
         batch_size, nb_nodes, nb_features, nb_slots = seq.get_shape()
         seq_tmp = tf.transpose(seq,perm=[0,1,3,2])
-        # seq_tmp = tf.reshape(seq_tmp, shape=[-1,nb_nodes*nb_slots,nb_features])
 
-        seq_fts = tf.layers.conv2d(seq_tmp, out_sz, 1, use_bias=False)
+        seq_fts = tf.layers.conv2d(seq_tmp, out_sz, 1, use_bias=True)
+        seq_fts = activation(seq_fts)
 
         # seq_fts = tf.reshape(seq_fts, shape=[-1, nb_nodes, nb_slots, out_sz])
         seq_fts = tf.transpose(seq_fts, perm=[0,2,1,3])
@@ -57,17 +57,20 @@ def attn_head_BNF(seq, out_sz, reweight_mat, activation, in_drop=0.0, residual=F
         vals = tf.transpose(vals, perm=[0,2,3,1])
         vals =activation(vals) # [batch_size, nb_nodes, nb_filters, nb_slots]
 
-        ret = tf.layers.conv2d(vals, nb_slots, 1, activation=activation)
+        ret = tf.layers.conv2d(vals, nb_slots, 1)
         # ret = tf.nn.softmax(ret, axis=1)
-        ret = tf.nn.l2_normalize(ret,axis=1)
+
 
         # residual connection
         if residual:
-            # if seq.shape[-1] != ret.shape[-1]:
-            #     ret = ret + conv1d(seq, ret.shape[-1], 1) # activation
-            # else:
-            #     seq_fts = ret + seq
-            ret = tf.concat([ret,seq],axis=2)
+            if seq.shape[-2] != ret.shape[-2]:
+                seq_jump = tf.transpose(seq,perm=[0,1,3,2])
+                seq_jump = tf.layers.conv2d(seq_jump,out_sz,1)
+                seq_jump = tf.transpose(seq_jump,perm=[0,1,3,2])
+                ret = ret+seq_jump
+
+        ret = activation(ret)
+        ret = tf.nn.l2_normalize(ret, axis=1)
 
         return  ret# activation
 

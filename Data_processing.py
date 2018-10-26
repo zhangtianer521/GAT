@@ -136,8 +136,8 @@ def augmentation_fmri_net(signals, labels, graphs, augsize):
     else:
         for i in range(augsize):
             ind = np.random.randint(signals.shape[0],size=1)[0]
-            endp = np.random.randint(int(signals.shape[1]/2-1),size=1)[0]  # now signal in dim1
-            aug_signal = signals[ind,endp:endp+int(signals.shape[1]/2),:]
+            endp = np.random.randint(int(signals.shape[1]/3-1),size=1)[0]  # signal in dim1
+            aug_signal = signals[ind,endp:endp+int(signals.shape[1]/3*2),:]
             aug_nets.append(signals_to_net(aug_signal))
             aug_labels.append(labels[ind])
             aug_graphs.append(graphs[ind:ind+1,...])

@@ -13,10 +13,11 @@ dataset = 'Schiz'
 
 # training params
 batch_size = 100
-nb_epochs = 200
-patience = 20
+nb_epochs = 300
+patience = 50
 lr = 0.01  # learning rate
-l2_coef = 0.005  # weight decay
+l2_coef = 0.001  # weight decay
+recon_lr_weight = 0.01
 hid_units = [32,32,32,32,16,16] # numbers of hidden units per each attention head in each layer
 n_heads = [1, 1, 1,1,1,1] # additional entry for the output layer
 residual = True
@@ -90,7 +91,7 @@ with tf.Graph().as_default():
         is_train = tf.placeholder(dtype=tf.bool, shape=())
         global_step = tf.Variable(0,trainable=False)
 
-    logits, prediction = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
+    logits, reconstruct_net = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
                                 net_mat=bias_in,
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
@@ -99,7 +100,7 @@ with tf.Graph().as_default():
     # log_resh = tf.reshape(logits, [-1, nb_classes])
     # lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
     # msk_resh = tf.reshape(msk_in, [-1])
-    loss = model.loss(logits, lbl_in)
+    loss = model.loss(logits, lbl_in, fmri_net, reconstruct_net, recon_lr_weight)
     accuracy = model.accuracy(logits, lbl_in)
 
     train_op = model.training(loss, lr, l2_coef, global_step)
@@ -125,7 +126,7 @@ with tf.Graph().as_default():
             tr_size = tr_features.shape[0]
 
             while tr_step * batch_size < tr_size:
-                _, loss_value_tr, acc_tr, logits_val = sess.run([train_op, loss, accuracy, logits],
+                _, loss_value_tr, acc_tr, recon_net = sess.run([train_op, loss, accuracy, logits],
 
                     feed_dict={
                         ftr_in: tr_features[tr_step*batch_size:(tr_step+1)*batch_size],
