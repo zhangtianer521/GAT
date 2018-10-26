@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0bd369ef-b13a-47a5-a976-84511c4d13e9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BNF.py" beforeDir="false" afterPath="$PROJECT_DIR$/BNF.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data_BNF/Schiz/sort_data.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Data_BNF/Schiz/sort_data.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Data_processing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Data_processing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/base_gattn.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_gattn.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/gat.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gat.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.data-00000-of-00001" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.index" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/layers.py" afterDir="false" />
-    </list>
+    <list default="true" id="0bd369ef-b13a-47a5-a976-84511c4d13e9" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +49,7 @@
         <entry file="file://$PROJECT_DIR$/models/gat.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="152">
-              <caret line="34" column="18" selection-start-line="34" selection-start-column="18" selection-end-line="34" selection-end-column="18" />
+              <caret line="40" column="57" lean-forward="true" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -537,7 +526,7 @@
     <entry file="file://$PROJECT_DIR$/models/gat.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
-          <caret line="34" column="18" selection-start-line="34" selection-start-column="18" selection-end-line="34" selection-end-column="18" />
+          <caret line="40" column="57" lean-forward="true" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
