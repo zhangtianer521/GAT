@@ -95,28 +95,22 @@ def load_data(Datadir, labelscsv, augmentation = 0):  ### labels: a cvs file
 
     # generate training and testing samples
 
-    train_fmri_signals, test_fmri_signals, train_labels, test_labels, train_graphs, test_graphs = train_test_split(fmri_signals,labels,graphs,test_size=0.2)
-    train_fmri_signals, val_fmri_signals, train_labels, val_labels, train_graphs, val_graphs = train_test_split(train_fmri_signals, train_labels, train_graphs, test_size=0.2)
-    # generate augmentation data
+    # train_fmri_signals, test_fmri_signals, train_labels, test_labels, train_graphs, test_graphs = train_test_split(fmri_signals,labels,graphs,test_size=0.2)
+    # train_fmri_signals, val_fmri_signals, train_labels, val_labels, train_graphs, val_graphs = train_test_split(train_fmri_signals, train_labels, train_graphs, test_size=0.2)
+    # # generate augmentation data
+    #
+    # train_fmri_net, train_labels , train_graph= augmentation_fmri_net(train_fmri_signals,train_labels,train_graphs,augmentation)
+    # val_fmri_net, val_labels, val_graph = augmentation_fmri_net(val_fmri_signals, val_labels, val_graphs, 0)
+    # test_fmri_net, test_labels , test_graph= augmentation_fmri_net(test_fmri_signals, test_labels, test_graphs, 0)
+    #
+    #
+    #
+    #
+    # return train_fmri_net, train_graph, train_labels, val_fmri_net, val_graph, val_labels, test_fmri_net, test_graph, test_labels
 
-    train_fmri_net, train_labels , train_graph= augmentation_fmri_net(train_fmri_signals,train_labels,train_graphs,augmentation)
-    val_fmri_net, val_labels, val_graph = augmentation_fmri_net(val_fmri_signals, val_labels, val_graphs, 0)
-    test_fmri_net, test_labels , test_graph= augmentation_fmri_net(test_fmri_signals, test_labels, test_graphs, 0)
+    return fmri_signals, labels, graphs
 
 
-    # labels = np.asarray(labels)
-    # indices = sample(range(features.shape[0]),int(features.shape[0]*0.8))
-    # train_features = features[indices]
-    # test_features = np.delete(features,indices)
-    # train_labels = labels[indices]
-    # test_labels = np.delete(labels,indices)
-
-
-    ### features: 3D array, [#subjects, #nodes, #feature_per_node]
-    ### graph: 2D array
-    ### labels: 1D list
-
-    return train_fmri_net, train_graph, train_labels, val_fmri_net, val_graph, val_labels, test_fmri_net, test_graph, test_labels
 
 
 def sparsity(net, sparsity_level):
