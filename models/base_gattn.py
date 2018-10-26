@@ -1,15 +1,19 @@
 import tensorflow as tf
 
 class BaseGAttN:
+
     def loss(logits, labels, fmri_net, recon_net, recon_lr_weight):
+
         # sample_wts = tf.reduce_sum(tf.multiply(tf.one_hot(labels, nb_classes), class_weights), axis=-1)
         # xentropy = tf.multiply(tf.nn.sparse_softmax_cross_entropy_with_logits(
         #         labels=labels, logits=logits), sample_wts)
         # return tf.reduce_mean(xentropy, name='xentropy_mean')
+
         classify_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
         Recons_loss = tf.reduce_mean(tf.square(fmri_net-tf.abs(recon_net)))
         # Recons_loss = tf.reduce_sum(Recons_loss,axis=1)
         return tf.reduce_mean(classify_loss, axis=0)+recon_lr_weight*Recons_loss
+
 
     def training(loss, lr, l2_coef, global_step):
         # weight decay

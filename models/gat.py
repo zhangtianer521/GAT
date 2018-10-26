@@ -39,7 +39,9 @@ class GAT_BNF(BaseGAttN):
         sparsity_mat = layers.sparsity_BNF(net_mat,nb_slots)
         fmri_mat = tf.expand_dims(fmri_net,3)
         reweight_mat = tf.multiply(sparsity_mat,fmri_mat)
+
         # reweight_mat = tf.contrib.layers.bias_add(reweight_mat)
+
 
         jump_out = []
         attns = []
@@ -69,7 +71,9 @@ class GAT_BNF(BaseGAttN):
         jump_out.append(Graph_out)
         jump_out = tf.concat(jump_out,axis=-2)
         jump_out = tf.reduce_max(jump_out,axis=2)
+
         recon_net = tf.matmul(jump_out,tf.transpose(jump_out,perm=[0,2,1]))
+
 
         # _, _, nb_filters,nb_slots=jump_out.get_shape()
         # jump_out = tf.reshape(jump_out,shape=[-1,nb_nodes,nb_filters*nb_slots])
@@ -91,4 +95,6 @@ class GAT_BNF(BaseGAttN):
         # logits = tf.contrib.layers.bias_add(node_out)
 
 
+
         return logits, tf.nn.sigmoid(recon_net)
+

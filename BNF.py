@@ -13,17 +13,21 @@ dataset = 'Schiz'
 
 # training params
 batch_size = 100
+
 nb_epochs = 300
 patience = 50
 lr = 0.01  # learning rate
 l2_coef = 0.001  # weight decay
 recon_lr_weight = 0.01
+
 hid_units = [32,32,32,32,16,16] # numbers of hidden units per each attention head in each layer
 n_heads = [1, 1, 1,1,1,1] # additional entry for the output layer
 residual = True
 nonlinearity = tf.nn.relu
 model = GAT_BNF
+
 augmentation = 500
+
 
 print('Dataset: ' + dataset)
 print('----- Opt. hyperparams -----')
@@ -36,6 +40,7 @@ print('nb. attention heads: ' + str(n_heads))
 print('residual: ' + str(residual))
 print('nonlinearity: ' + str(nonlinearity))
 print('model: ' + str(model))
+
 
 tr_fmri_net, tr_adj, tr_labels, val_fmri_net, val_adj, val_labels, test_fmri_net, test_adj, test_labels = \
     Data_processing.load_data('Data_BNF/'+dataset+'/','Data_BNF/'+dataset+'/labels.csv', augmentation)
@@ -62,6 +67,7 @@ test_features = np.ones((test_adj.shape[0], nb_nodes, ft_size, nb_slot))
 
 
 # batch_size = train_adj.shape[0]
+
 
 # adj = adj.todense()
 
@@ -91,16 +97,21 @@ with tf.Graph().as_default():
         is_train = tf.placeholder(dtype=tf.bool, shape=())
         global_step = tf.Variable(0,trainable=False)
 
+
     logits, reconstruct_net = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
+
                                 net_mat=bias_in,
                                 hid_units=hid_units, n_heads=n_heads,
                                 residual=residual, activation=nonlinearity)
 
 
+
     # log_resh = tf.reshape(logits, [-1, nb_classes])
     # lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
     # msk_resh = tf.reshape(msk_in, [-1])
+
     loss = model.loss(logits, lbl_in, fmri_net, reconstruct_net, recon_lr_weight)
+
     accuracy = model.accuracy(logits, lbl_in)
 
     train_op = model.training(loss, lr, l2_coef, global_step)
@@ -123,6 +134,7 @@ with tf.Graph().as_default():
 
         for epoch in range(nb_epochs):
             tr_step = 0
+
             tr_size = tr_features.shape[0]
 
             while tr_step * batch_size < tr_size:
@@ -133,6 +145,7 @@ with tf.Graph().as_default():
                         bias_in: tr_adj[tr_step*batch_size:(tr_step+1)*batch_size],
                         lbl_in: tr_labels[tr_step*batch_size:(tr_step+1)*batch_size],
                         fmri_net: tr_fmri_net[tr_step*batch_size:(tr_step+1)*batch_size],
+
                         # msk_in: train_mask[tr_step*batch_size:(tr_step+1)*batch_size],
                         is_train: True})
                 train_loss_avg += loss_value_tr
@@ -142,15 +155,19 @@ with tf.Graph().as_default():
                 # print('Logit value is {}, ------------------------------'.format(logits_val))
 
             vl_step = 0
+
             vl_size = val_features.shape[0]
+
 
             while vl_step * batch_size < vl_size:
                 loss_value_vl, acc_vl = sess.run([loss, accuracy],
                     feed_dict={
+
                         ftr_in: val_features[vl_step*batch_size:(vl_step+1)*batch_size],
                         bias_in: val_adj[vl_step*batch_size:(vl_step+1)*batch_size],
                         lbl_in: val_labels[vl_step*batch_size:(vl_step+1)*batch_size],
                         fmri_net: val_fmri_net[vl_step*batch_size:(vl_step+1)*batch_size],
+
                         # msk_in: val_mask[vl_step*batch_size:(vl_step+1)*batch_size],
                         is_train: False})
                 val_loss_avg += loss_value_vl
@@ -183,6 +200,7 @@ with tf.Graph().as_default():
 
         saver.restore(sess, checkpt_file)
 
+
         ts_size = test_features.shape[0]
         ts_step = 0
         ts_loss = 0.0
@@ -202,5 +220,6 @@ with tf.Graph().as_default():
             ts_step += 1
 
         print('Test loss:', ts_loss/ts_step, '; Test accuracy:', ts_acc/ts_step)
+
 
         sess.close()

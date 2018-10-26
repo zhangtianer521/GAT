@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="0bd369ef-b13a-47a5-a976-84511c4d13e9" name="Default Changelist" comment="" />
+=======
+    <list default="true" id="0bd369ef-b13a-47a5-a976-84511c4d13e9" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BNF.py" beforeDir="false" afterPath="$PROJECT_DIR$/BNF.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/base_gattn.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/base_gattn.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.index" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.meta" beforeDir="false" afterPath="$PROJECT_DIR$/pre_trained/cora/mod_cora.ckpt.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/layers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/layers.py" afterDir="false" />
+    </list>
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,34 +34,59 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
+<<<<<<< HEAD
           <entry key="py" value="25" />
+=======
+          <entry key="py" value="20" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
+<<<<<<< HEAD
           <entry key="Python" value="25" />
+=======
+          <entry key="Python" value="20" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
+<<<<<<< HEAD
           <entry key="Python Console" value="1409" />
           <entry key="py" value="7565" />
+=======
+          <entry key="Python Console" value="851" />
+          <entry key="py" value="4786" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
+<<<<<<< HEAD
           <entry key="Python" value="8974" />
+=======
+          <entry key="Python" value="5637" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/models/gat.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="152">
               <caret line="40" column="57" lean-forward="true" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
+=======
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/models/gat.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="846">
+              <caret line="65" column="38" selection-start-line="65" selection-start-column="38" selection-end-line="65" selection-end-column="38" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -60,8 +97,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/layers.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="-640">
               <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+=======
+            <state relative-caret-position="8">
+              <caret line="38" column="44" selection-start-line="38" selection-start-column="44" selection-end-line="38" selection-end-column="44" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -70,10 +112,26 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+<<<<<<< HEAD
         <entry file="file://$PROJECT_DIR$/BNF.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="342">
               <caret line="19" column="22" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
+=======
+        <entry file="file://$PROJECT_DIR$/models/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret column="17" selection-start-column="17" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/BNF.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1502">
+              <caret line="120" column="92" selection-start-line="120" selection-start-column="92" selection-end-line="120" selection-end-column="92" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -90,6 +148,7 @@
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Data_processing.py">
           <provider selected="true" editor-type-id="text-editor">
@@ -102,6 +161,17 @@
                 <marker date="1540416386036" expanded="true" signature="5019:5879" ph="..." />
                 <marker date="1540416386036" expanded="true" signature="5979:6087" ph="..." />
                 <marker date="1540416386036" expanded="true" signature="7668:8327" ph="..." />
+=======
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Data_processing.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="320">
+              <caret line="97" column="77" selection-start-line="97" selection-start-column="77" selection-end-line="97" selection-end-column="77" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+                <marker date="1540269718395" expanded="true" signature="3609:3975" ph="..." />
+                <marker date="1540269718395" expanded="true" signature="4075:4183" ph="..." />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
               </folding>
             </state>
           </provider>
@@ -110,10 +180,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/models/base_gattn.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="169">
               <caret line="11" column="80" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
               <folding>
                 <marker date="1540530566535" expanded="true" signature="109:118" ph="..." />
+=======
+            <state relative-caret-position="342">
+              <caret line="19" column="59" selection-start-line="19" selection-start-column="59" selection-end-line="19" selection-end-column="59" />
+              <folding>
+                <marker date="1540314979059" expanded="true" signature="71:80" ph="..." />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
               </folding>
             </state>
           </provider>
@@ -135,6 +212,7 @@
       <list>
         <option value="$PROJECT_DIR$/execute_cora.py" />
         <option value="$USER_HOME$/Downloads/TA_scripts/grade_lab03.py" />
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/models/__init__.py" />
         <option value="$PROJECT_DIR$/utils/layers.py" />
         <option value="$PROJECT_DIR$/Data_processing.py" />
@@ -143,6 +221,15 @@
         <option value="$PROJECT_DIR$/models/gat.py" />
         <option value="$PROJECT_DIR$/models/base_gattn.py" />
         <option value="$PROJECT_DIR$/BNF.py" />
+=======
+        <option value="$USER_HOME$/Downloads/lab04_grader/grade_lab04.py" />
+        <option value="$PROJECT_DIR$/Data_processing.py" />
+        <option value="$PROJECT_DIR$/models/__init__.py" />
+        <option value="$PROJECT_DIR$/utils/layers.py" />
+        <option value="$PROJECT_DIR$/models/gat.py" />
+        <option value="$PROJECT_DIR$/BNF.py" />
+        <option value="$PROJECT_DIR$/models/base_gattn.py" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       </list>
     </option>
   </component>
@@ -244,7 +331,11 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+<<<<<<< HEAD
     <configuration name="gat" type="PythonConfigurationType" factoryName="Python" temporary="true">
+=======
+    <configuration name="grade_lab03" type="PythonConfigurationType" factoryName="Python" temporary="true">
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       <module name="GAT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -252,11 +343,19 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+<<<<<<< HEAD
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/models" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/models/gat.py" />
+=======
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Downloads/TA_scripts" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$USER_HOME$/Downloads/TA_scripts/grade_lab03.py" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -286,7 +385,11 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+<<<<<<< HEAD
     <configuration name="grade_lab05" type="PythonConfigurationType" factoryName="Python" temporary="true">
+=======
+    <configuration name="layers" type="PythonConfigurationType" factoryName="Python" temporary="true">
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       <module name="GAT" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -294,11 +397,19 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
+<<<<<<< HEAD
       <option name="WORKING_DIRECTORY" value="$USER_HOME$/Downloads/lab04_grader" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$USER_HOME$/Downloads/lab04_grader/grade_lab05.py" />
+=======
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/layers.py" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -309,18 +420,32 @@
     </configuration>
     <list>
       <item itemvalue="Python.BNF" />
+<<<<<<< HEAD
       <item itemvalue="Python.Data_processing" />
       <item itemvalue="Python.grade_lab04" />
       <item itemvalue="Python.gat" />
       <item itemvalue="Python.grade_lab05" />
+=======
+      <item itemvalue="Python.grade_lab03" />
+      <item itemvalue="Python.Data_processing" />
+      <item itemvalue="Python.layers" />
+      <item itemvalue="Python.grade_lab04" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.BNF" />
+<<<<<<< HEAD
         <item itemvalue="Python.grade_lab05" />
         <item itemvalue="Python.grade_lab04" />
         <item itemvalue="Python.Data_processing" />
         <item itemvalue="Python.gat" />
+=======
+        <item itemvalue="Python.grade_lab04" />
+        <item itemvalue="Python.layers" />
+        <item itemvalue="Python.Data_processing" />
+        <item itemvalue="Python.grade_lab03" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
       </list>
     </recent_temporary>
   </component>
@@ -378,8 +503,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/gat.py</url>
+<<<<<<< HEAD
           <line>89</line>
           <option name="timeStamp" value="56" />
+=======
+          <line>40</line>
+          <option name="timeStamp" value="39" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -447,10 +577,17 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/models/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="17" selection-start-column="17" selection-end-column="17" />
+=======
+    <entry file="file://$USER_HOME$/Downloads/lab04_grader/grade_lab04.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="26" column="14" lean-forward="true" selection-start-line="26" selection-start-column="14" selection-end-line="26" selection-end-column="14" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
         </state>
       </provider>
     </entry>
@@ -461,6 +598,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$USER_HOME$/Downloads/lab04_grader/grade_lab04.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
@@ -482,32 +620,64 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-640">
           <caret line="17" lean-forward="true" selection-start-line="17" selection-end-line="17" />
+=======
+    <entry file="file://$PROJECT_DIR$/models/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="17" selection-start-column="17" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/models/gat.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="846">
+          <caret line="65" column="38" selection-start-line="65" selection-start-column="38" selection-end-line="65" selection-end-column="38" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/BNF.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="342">
           <caret line="19" column="22" selection-start-line="19" selection-start-column="22" selection-end-line="19" selection-end-column="22" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
+=======
+    <entry file="file://$PROJECT_DIR$/models/base_gattn.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="19" column="59" selection-start-line="19" selection-start-column="59" selection-end-line="19" selection-end-column="59" />
+          <folding>
+            <marker date="1540314979059" expanded="true" signature="71:80" ph="..." />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/models/base_gattn.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
           <caret line="11" column="80" selection-start-line="11" selection-start-column="80" selection-end-line="11" selection-end-column="80" />
           <folding>
             <marker date="1540530566535" expanded="true" signature="109:118" ph="..." />
+=======
+    <entry file="file://$PROJECT_DIR$/BNF.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1502">
+          <caret line="120" column="92" selection-start-line="120" selection-start-column="92" selection-end-line="120" selection-end-column="92" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/Data_processing.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
@@ -519,16 +689,35 @@
             <marker date="1540416386036" expanded="true" signature="5019:5879" ph="..." />
             <marker date="1540416386036" expanded="true" signature="5979:6087" ph="..." />
             <marker date="1540416386036" expanded="true" signature="7668:8327" ph="..." />
+=======
+    <entry file="file://$PROJECT_DIR$/utils/layers.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="8">
+          <caret line="38" column="44" selection-start-line="38" selection-start-column="44" selection-end-line="38" selection-end-column="44" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
           </folding>
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/models/gat.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="152">
           <caret line="40" column="57" lean-forward="true" selection-start-line="40" selection-start-column="57" selection-end-line="40" selection-end-column="57" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
+=======
+    <entry file="file://$PROJECT_DIR$/Data_processing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="320">
+          <caret line="97" column="77" selection-start-line="97" selection-start-column="77" selection-end-line="97" selection-end-column="77" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <marker date="1540269718395" expanded="true" signature="3609:3975" ph="..." />
+            <marker date="1540269718395" expanded="true" signature="4075:4183" ph="..." />
+>>>>>>> 8f02563c16275e4f6a3d3a057697e705f1a0c02a
           </folding>
         </state>
       </provider>
