@@ -5,7 +5,7 @@ from random import sample
 import csv
 import pandas as pd
 import nilearn.connectome as connectome
-
+import random
 import pickle
 
 
@@ -36,7 +36,7 @@ def data_reorder(Datadir):
             DTI_connectivity = DTI_connectivity/row_sum[:,np.newaxis]
             np.fill_diagonal(DTI_connectivity,1)
             # DTI_connectivity = DTI_connectivity / (DTI_connectivity.sum(axis=1).transpose())
-            # DTI_connectivity = (DTI_connectivity.transpose() + DTI_connectivity) / 2
+            DTI_connectivity = (DTI_connectivity.transpose() + DTI_connectivity) / 2
             # DTI_connectivity = sparsity(DTI_connectivity,sparsity_levels)
             DTI_connects.append(DTI_connectivity)
 
@@ -70,7 +70,7 @@ def load_data(Datadir, labelscsv, augmentation = 0):  ### labels: a cvs file
     fmri_signals, DTI_net = data_reorder(Datadir)
 
 
-    graphs = np.zeros(DTI_net.shape)
+    # graphs = np.zeros(DTI_net.shape)
 
     # for i in range(graphs.shape[3]):
     #     graphs[...,i] = np.multiply(fmri_net,DTI_net[...,i])
@@ -108,7 +108,7 @@ def load_data(Datadir, labelscsv, augmentation = 0):  ### labels: a cvs file
     #
     # return train_fmri_net, train_graph, train_labels, val_fmri_net, val_graph, val_labels, test_fmri_net, test_graph, test_labels
 
-    return fmri_signals, labels, graphs
+    return fmri_signals, labels, DTI_net
 
 
 
@@ -127,10 +127,10 @@ def sparsity(net, sparsity_level):
 
 
 def signals_to_net(signal):
-    estimator = connectome.ConnectivityMeasure()
+    estimator = connectome.ConnectivityMeasure(kind='correlation')
     fmri_net = estimator.fit_transform([signal])[0]
-    fmri_net = np.abs(fmri_net)
-    fmri_net = normalize_mat(fmri_net)
+    # fmri_net = np.abs(fmri_net)
+    # fmri_net = normalize_mat(fmri_net)
     return fmri_net
 
 def augmentation_fmri_net(signals, labels, graphs, augsize):
@@ -160,7 +160,8 @@ def one_hot(labels):
     return pd.get_dummies(s)
 
 def normalize_mat(net):
-    flatten = np.matrix.flatten(net)
+    net = net - np.diag(np.diag(net))
+    flatten = np.matrix.flatten(abs(net))
     sort = np.sort(flatten)
     net = net/sort[-1]*1
     return net
@@ -230,6 +231,68 @@ def load_sorted_data(dir):
     return train_fmri_net, train_graphs, train_labels, val_fmri_net, val_graphs, val_labels, test_fmri_net, test_graphs, test_labels
 
 
+def synthesis_data(Datadir, labelscsv, augmentation = 2000):  ### labels: a cvs file
+    fmri_signals, DTI_net = data_reorder(Datadir)
+
+    fmri_nets = np.zeros([fmri_signals.shape[0],fmri_signals.shape[2],fmri_signals.shape[2]])
+    for ind in range(fmri_nets.shape[0]):
+        fmri_nets[ind] = signals_to_net(fmri_signals[ind])
+
+    mean_fmri_net = np.mean(fmri_nets,axis=0)
+
+    mean_DTI_net = np.mean(DTI_net,axis=0)
+
+
+    reg_id = [12, 145]
+    reg_weight = [60, 100]
+
+
+
+
+    syn_fmri_nets = []
+    syn_DTI_nets = []
+    labels = []
+    for i in range(augmentation):
+        noise = np.random.rand(mean_fmri_net.shape[0],mean_fmri_net.shape[1])
+        noise = noise + noise.T
+        noise = (noise-noise.min())/(noise.max()-noise.min())*0.01
+
+        injury_mat_A = np.ones(mean_fmri_net.shape)
+        injury_vec = 1 + reg_weight[0] * np.random.uniform(0, 0.1, injury_mat_A.shape[0])*np.random.rand(1)
+        injury_mat_A[reg_id[0], :] = injury_vec
+        injury_mat_A[:, reg_id[0]] = injury_vec
+
+        injury_mat_B = np.ones(mean_fmri_net.shape)
+        injury_vec = 1 + reg_weight[1] * np.random.uniform(0, 0.1, injury_mat_B.shape[0])*np.random.rand(1)
+        injury_mat_B[reg_id[1], :] = injury_vec
+        injury_mat_B[:, reg_id[1]] = injury_vec
+
+        injury_mat_fmri = mean_fmri_net / (injury_mat_A * injury_mat_B)
+        injury_mat_DTI = mean_DTI_net / (injury_mat_A * injury_mat_B)
+
+        np.fill_diagonal(injury_mat_fmri, 1)
+        np.fill_diagonal(injury_mat_DTI, 1)
+
+        id = random.getrandbits(1)
+        labels.append(id)
+        if id==1:
+            syn_fmri_nets.append(injury_mat_fmri+np.median(mean_fmri_net)*noise)
+            syn_DTI_nets.append(injury_mat_DTI + np.median(mean_DTI_net) * noise)
+        elif id==0:
+            syn_fmri_nets.append(mean_fmri_net + np.median(mean_fmri_net) * noise)
+            syn_DTI_nets.append(mean_DTI_net + np.median(mean_DTI_net) * noise)
+
+    syn_fmri_nets = np.stack(syn_fmri_nets,axis=0)
+    syn_DTI_nets = np.stack(syn_DTI_nets,axis=0)
+
+
+    return syn_fmri_nets, syn_DTI_nets, labels
+
+
+
+
+
+
 if __name__ == '__main__':
     # data_reorder('/home/wen/Documents/gcn_kifp/Data/')
     # load_data('../Data/', '../Data/labels.csv')
@@ -250,6 +313,8 @@ if __name__ == '__main__':
     # csvfiles = ['/mnt/easystore_8T/Wen_Data/Schizophrenia/COBRE/participants.tsv']
     # creat_csv_Schiz('/home/local/ASUAD/wzhan139/Dropbox (ASU)/Project_Code/GCN_kipf/Data/Schiz/DTI_passed_subj.txt',
     #           csvfiles, '/home/local/ASUAD/wzhan139/Dropbox (ASU)/Project_Code/GCN_kipf/Data/Schiz/labels.csv')
+
+    #--------------------------------------------------------------
 
     train_fmri_net, train_adj, train_labels, val_fmri_net, val_adj, val_labels, test_fmri_net, test_adj, test_labels = \
         load_data('Data_BNF/Schiz/', 'Data_BNF/Schiz/labels.csv', 500)
@@ -277,4 +342,6 @@ if __name__ == '__main__':
     pkl_file = open('Data_BNF/Schiz/sort_data.pkl', 'wb')
     pickle.dump(data,pkl_file)
     pkl_file.close()
+    #--------------------------------------------------------------------------------------
+
 

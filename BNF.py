@@ -2,7 +2,7 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from models import GAT_BNF
+from models import GAT_BNF, GAT_bi_BNF
 from sklearn.model_selection import train_test_split
 import Data_processing
 from sklearn.model_selection import KFold
@@ -15,19 +15,19 @@ dataset = 'Schiz'
 # training params
 batch_size = 100
 
-nb_epochs = 300
-patience = 50
-lr = 0.01  # learning rate
-l2_coef = 0.001  # weight decay
-recon_lr_weight = 0.01
+nb_epochs = 400
+patience = 30
+lr = 0.005  # learning rate
+l2_coef = 0.005  # weight decay
+recon_lr_weight = 0.001
 
 hid_units = [32,32,32,32,16,16] # numbers of hidden units per each attention head in each layer
 n_heads = [1, 1, 1,1,1,1] # additional entry for the output layer
 residual = True
 nonlinearity = tf.nn.relu
-model = GAT_BNF
+model = GAT_bi_BNF
 
-augmentation = 500
+augmentation = 200
 
 
 print('Dataset: ' + dataset)
@@ -60,33 +60,33 @@ test_loss_avg = []
 test_acc_avg = []
 
 for train_ind, test_ind in kf.split(fmri_signals):
-    train_fmri_signals, test_fmri_signals = fmri_signals[train_ind], fmri_signals[test_ind]
-    train_labels, test_labels = labels[train_ind], labels[test_ind]
-    train_graphs, test_graphs = graphs[train_ind], graphs[test_ind]
+    train_fmri_rsignals, test_fmri_rsignals = fmri_signals[train_ind], fmri_signals[test_ind]
+    train_rlabels, test_rlabels = labels[train_ind], labels[test_ind]
+    train_rgraphs, test_rgraphs = graphs[train_ind], graphs[test_ind]
 
-    train_fmri_signals, val_fmri_signals, train_labels, val_labels, train_graphs, val_graphs = train_test_split(
-        train_fmri_signals, train_labels, train_graphs, test_size=0.2)
+    train_fmri_rsignals, val_fmri_rsignals, train_rlabels, val_rlabels, train_rgraphs, val_rgraphs = train_test_split(
+        train_fmri_rsignals, train_rlabels, train_rgraphs, test_size=0.2)
 
-    tr_fmri_net, tr_labels, tr_adj = Data_processing.augmentation_fmri_net(train_fmri_signals, train_labels, train_graphs,
+    tr_fmri_net, tr_labels, tr_adj = Data_processing.augmentation_fmri_net(train_fmri_rsignals, train_rlabels, train_rgraphs,
                                                                       augmentation)
-    val_fmri_net, val_labels, val_adj = Data_processing.augmentation_fmri_net(val_fmri_signals, val_labels, val_graphs, 0)
-    test_fmri_net, test_labels , test_adj = Data_processing.augmentation_fmri_net(test_fmri_signals, test_labels, test_graphs, 0)
+    val_fmri_net, val_labels, val_adj = Data_processing.augmentation_fmri_net(val_fmri_rsignals, val_rlabels, val_rgraphs, 0)
+    test_fmri_net, test_labels, test_adj = Data_processing.augmentation_fmri_net(test_fmri_rsignals, test_rlabels, test_rgraphs, 0)
 
 
 
     train_size = tr_fmri_net.shape[0]
     nb_nodes = tr_adj.shape[1]
     ft_size = 1
-    nb_slot = 20
+    nb_slot = 10
     nb_classes = 2
 
     tr_labels = Data_processing.one_hot(tr_labels)
     val_labels = Data_processing.one_hot(val_labels)
     test_labels = Data_processing.one_hot(test_labels)
 
-    tr_features = np.ones((tr_adj.shape[0],nb_nodes,ft_size, nb_slot))
-    val_features = np.ones((val_adj.shape[0],nb_nodes,ft_size, nb_slot))
-    test_features = np.ones((test_adj.shape[0], nb_nodes, ft_size, nb_slot))
+    tr_features = np.ones((tr_adj.shape[0],nb_nodes,ft_size, nb_slot))/nb_nodes
+    val_features = np.ones((val_adj.shape[0],nb_nodes,ft_size, nb_slot))/nb_nodes
+    test_features = np.ones((test_adj.shape[0], nb_nodes, ft_size, nb_slot))/nb_nodes
 
 
 
@@ -124,11 +124,9 @@ for train_ind, test_ind in kf.split(fmri_signals):
             global_step = tf.Variable(0,trainable=False)
 
 
-        logits, reconstruct_net = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
-
-                                    net_mat=bias_in,
-                                    hid_units=hid_units, n_heads=n_heads,
-                                    residual=residual, activation=nonlinearity)
+        logits, reconstruct_net_DTI, reconstruct_net_fmri = model.inference(ftr_in, nb_classes, fmri_net, nb_slot, is_train,
+                                                        net_mat=bias_in,hid_units=hid_units, n_heads=n_heads,
+                                                        residual=residual, activation=nonlinearity)
 
 
 
@@ -136,7 +134,8 @@ for train_ind, test_ind in kf.split(fmri_signals):
         # lab_resh = tf.reshape(lbl_in, [-1, nb_classes])
         # msk_resh = tf.reshape(msk_in, [-1])
 
-        loss = model.loss(logits, lbl_in, fmri_net, reconstruct_net, recon_lr_weight)
+        # loss = model.loss(logits, lbl_in, fmri_net, reconstruct_net, recon_lr_weight)
+        loss = model.bi_loss(logits, lbl_in, fmri_net, reconstruct_net_fmri, bias_in, reconstruct_net_DTI, recon_lr_weight)
 
         accuracy = model.accuracy(logits, lbl_in)
 
@@ -171,7 +170,6 @@ for train_ind, test_ind in kf.split(fmri_signals):
                             bias_in: tr_adj[tr_step*batch_size:(tr_step+1)*batch_size],
                             lbl_in: tr_labels[tr_step*batch_size:(tr_step+1)*batch_size],
                             fmri_net: tr_fmri_net[tr_step*batch_size:(tr_step+1)*batch_size],
-
                             # msk_in: train_mask[tr_step*batch_size:(tr_step+1)*batch_size],
                             is_train: True})
                     train_loss_avg += loss_value_tr
@@ -200,9 +198,37 @@ for train_ind, test_ind in kf.split(fmri_signals):
                     val_acc_avg += acc_vl
                     vl_step += 1
 
-                print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f' %
+
+### ------------------------------------------------------------------------------
+
+                ts_size = test_features.shape[0]
+                ts_step = 0
+                ts_loss = 0.0
+                ts_acc = 0.0
+
+                while ts_step * batch_size < ts_size:
+                    loss_value_ts, acc_ts = sess.run([loss, accuracy],
+                                                     feed_dict={
+                                                         ftr_in: test_features[
+                                                                 ts_step * batch_size:(ts_step + 1) * batch_size],
+                                                         bias_in: test_adj[
+                                                                  ts_step * batch_size:(ts_step + 1) * batch_size],
+                                                         lbl_in: test_labels[
+                                                                 ts_step * batch_size:(ts_step + 1) * batch_size],
+                                                         fmri_net: test_fmri_net[
+                                                                   ts_step * batch_size:(ts_step + 1) * batch_size],
+                                                         # msk_in: test_mask[ts_step*batch_size:(ts_step+1)*batch_size],
+                                                         is_train: False})
+                    ts_loss += loss_value_ts
+                    ts_acc += acc_ts
+                    ts_step += 1
+###---------------------------------------------------------------------------------------------
+
+
+                print('Training: loss = %.5f, acc = %.5f | Val: loss = %.5f, acc = %.5f | Test: loss = %.5f, acc = %.5f' %
                         (train_loss_avg/tr_step, train_acc_avg/tr_step,
-                        val_loss_avg/vl_step, val_acc_avg/vl_step))
+                        val_loss_avg/vl_step, val_acc_avg/vl_step,
+                         ts_loss / ts_step, ts_acc / ts_step))
 
                 if val_acc_avg/vl_step >= vacc_mx or val_loss_avg/vl_step <= vlss_mn:
                     if val_acc_avg/vl_step >= vacc_mx and val_loss_avg/vl_step <= vlss_mn:
@@ -214,7 +240,7 @@ for train_ind, test_ind in kf.split(fmri_signals):
                     curr_step = 0
                 else:
                     curr_step += 1
-                    if curr_step == patience:
+                    if curr_step == patience and epoch>50:
                         print('Early stop! Min loss: ', vlss_mn, ', Max accuracy: ', vacc_mx)
                         print('Early stop model validation loss: ', vlss_early_model, ', accuracy: ', vacc_early_model)
                         break

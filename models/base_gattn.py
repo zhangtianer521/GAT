@@ -10,9 +10,22 @@ class BaseGAttN:
         # return tf.reduce_mean(xentropy, name='xentropy_mean')
 
         classify_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
-        Recons_loss = tf.reduce_mean(tf.square(fmri_net-tf.abs(recon_net)))
+        Recons_loss = tf.reduce_mean(tf.square(fmri_net-recon_net))
         # Recons_loss = tf.reduce_sum(Recons_loss,axis=1)
         return tf.reduce_mean(classify_loss, axis=0)+recon_lr_weight*Recons_loss
+
+    def bi_loss(logits, labels, fmri_net, recon_net_fmri, DTI_net, recon_net_DTI, recon_lr_weight):
+
+        # sample_wts = tf.reduce_sum(tf.multiply(tf.one_hot(labels, nb_classes), class_weights), axis=-1)
+        # xentropy = tf.multiply(tf.nn.sparse_softmax_cross_entropy_with_logits(
+        #         labels=labels, logits=logits), sample_wts)
+        # return tf.reduce_mean(xentropy, name='xentropy_mean')
+
+        classify_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+        Recons_loss_fmri = tf.reduce_mean(tf.square(fmri_net-recon_net_fmri))
+        Recons_loss_DTI = tf.reduce_mean(tf.square(DTI_net - recon_net_DTI))
+        # Recons_loss = tf.reduce_sum(Recons_loss,axis=1)
+        return tf.reduce_mean(classify_loss, axis=0)+recon_lr_weight*(Recons_loss_fmri+0.1*Recons_loss_DTI)
 
 
     def training(loss, lr, l2_coef, global_step):
@@ -22,7 +35,7 @@ class BaseGAttN:
                            in ['bias', 'gamma', 'b', 'g', 'beta']]) * l2_coef
 
         # optimizer
-        current_lr = tf.train.exponential_decay(lr,global_step,10, 0.99, staircase=True)
+        current_lr = tf.train.exponential_decay(lr,global_step,10, 0.95, staircase=True)
         opt = tf.train.AdamOptimizer(learning_rate=current_lr)
 
         # training op

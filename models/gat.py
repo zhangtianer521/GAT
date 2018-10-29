@@ -39,6 +39,8 @@ class GAT_BNF(BaseGAttN):
         sparsity_mat = layers.sparsity_BNF(net_mat,nb_slots)
         fmri_mat = tf.expand_dims(fmri_net,3)
         reweight_mat = tf.multiply(sparsity_mat,fmri_mat)
+        # reweight_mat = tf.nn.l2_normalize(reweight_mat,axis=2)
+        # reweight_mat = reweight_mat/tf.reduce_sum(sparsity_mat,axis=2,keep_dims=True)
 
         # reweight_mat = tf.contrib.layers.bias_add(reweight_mat)
 
@@ -97,4 +99,170 @@ class GAT_BNF(BaseGAttN):
 
 
         return logits, tf.nn.sigmoid(recon_net)
+
+
+
+class GAT_bi_BNF(BaseGAttN):
+    # inputs dim: [batch_size, nb_nodes, nb_features, nb_slots]
+    def inference(inputs, nb_classes, fmri_net, nb_slots, training,
+                  net_mat, hid_units, n_heads, activation=tf.nn.elu, residual=False):
+        # sparsity net to get reweight_mat
+        sparsity_DTI_mat = layers.sparsity_BNF(net_mat, nb_slots-1)
+        sparsity_fmri_mat = layers.sparsity_BNF(fmri_net, nb_slots-1)
+
+        fmri_mat = tf.expand_dims(fmri_net, 3)
+        reweight_fmri_mat = tf.multiply(sparsity_DTI_mat, fmri_mat)
+        reweight_fmri_mat = tf.concat([reweight_fmri_mat,fmri_mat],axis=-1)
+
+
+        DTI_mat = tf.expand_dims(net_mat, 3)
+        reweight_DTI_mat = tf.multiply(sparsity_fmri_mat, DTI_mat)
+        reweight_DTI_mat = tf.concat([reweight_DTI_mat, DTI_mat], axis=-1)
+
+        jump_fmri_out = []
+        jump_DTI_out = []
+        fmri_1 = layers.attn_head_BNF(inputs, reweight_mat=reweight_fmri_mat,
+                                              out_sz=hid_units[0], activation=activation,
+                                              residual=False)
+        DTI_1 = layers.attn_head_BNF(inputs, reweight_mat=reweight_DTI_mat,
+                                              out_sz=hid_units[0], activation=activation,
+                                              residual=False)
+        jump_fmri_out.append(fmri_1)
+        jump_DTI_out.append(DTI_1)
+        for i in range(1, len(hid_units)):
+            fmri_1 = layers.attn_head_BNF(fmri_1, reweight_mat=reweight_fmri_mat,
+                                                  out_sz=hid_units[i], activation=activation,
+                                                  residual=residual)
+
+            DTI_1 = layers.attn_head_BNF(DTI_1, reweight_mat=reweight_DTI_mat,
+                                          out_sz=hid_units[i], activation=activation,
+                                          residual=residual)
+            jump_fmri_out.append(fmri_1)
+            jump_DTI_out.append(DTI_1)
+
+        jump_fmri_out = tf.concat(jump_fmri_out, axis=-2)
+        jump_fmri_out = tf.reduce_max(jump_fmri_out, axis=2)
+
+        jump_DTI_out = tf.concat(jump_DTI_out, axis=-2)
+        jump_DTI_out = tf.reduce_max(jump_DTI_out, axis=2)
+
+        recon_net_fmri = tf.matmul(jump_fmri_out, tf.transpose(jump_fmri_out, perm=[0, 2, 1]))
+        recon_net_DTI = tf.matmul(jump_DTI_out, tf.transpose(jump_DTI_out, perm=[0, 2, 1]))
+
+        # _, _, nb_filters,nb_slots=jump_out.get_shape()
+        # jump_out = tf.reshape(jump_out,shape=[-1,nb_nodes,nb_filters*nb_slots])
+        # fc1 = tf.layers.conv1d(jump_out,50,1,activation=activation)
+        fc_fmri = tf.layers.conv1d(jump_fmri_out, 1, 1, activation=activation)
+        fc_DTI = tf.layers.conv1d(jump_DTI_out, 1, 1, activation=activation)
+
+        fc = tf.concat([fc_fmri,fc_DTI],axis=-1)
+
+        # fc1 = tf.squeeze(fc1,axis=-1)
+        #
+        # Slot_out = tf.layers.conv1d(Graph_out,1,1,use_bias=True)
+        # Slot_out = tf.squeeze(Slot_out,axis=2)  # Slot_out: [batch_size, nb_nodes]
+        # # Slot_out = tf.contrib.layers.bias_add(Slot_out)
+        # node_weight = tf.nn.softmax(Slot_out)
+        # Slot_out = tf.nn.relu(Slot_out)
+
+        # Graph_out = tf.reshape(Graph_out,shape=[-1,nb_nodes*nb_slots])
+        Graph_out = tf.layers.flatten(fc)
+        logits = tf.layers.dense(Graph_out, nb_classes)
+        # logits = tf.contrib.layers.bias_add(node_out)
+
+        return logits, tf.nn.sigmoid(recon_net_DTI),tf.nn.sigmoid(recon_net_fmri)
+
+
+class Brainnetcnn:
+
+    def inference(nb_classes, fmri_net, training,
+                  net_mat, hid_units, dropout=0, activation=tf.nn.elu, residual=False):
+        ### input: [batch_size, n_nodes, n_nodes]
+
+        network1 = Brainnetcnn.network_structure(fmri_net,training, activation)
+        network2 = Brainnetcnn.network_structure(net_mat,training, activation)
+
+        concat = tf.concat([network1,network2],axis=-1)
+        logit = tf.layers.dense(network1, nb_classes)
+        return logit, network1
+
+
+    def network_structure(net, training, activation=tf.nn.elu ):
+
+        hide_s = [32, 32, 64, 256, 128, 30]
+        batch_size, n_nodes, _ = net.get_shape()
+
+        signal = tf.reshape(net, shape=[-1, n_nodes, 1, 1])
+        conv1 = tf.layers.conv2d(signal, hide_s[0], kernel_size=[n_nodes, 1], activation=activation)
+        conv2 = tf.layers.conv2d(signal, hide_s[0], kernel_size=[n_nodes, 1], activation=activation)
+        re_conv1 = tf.reshape(conv1, shape=[-1, n_nodes, 1, hide_s[0]])
+        re_conv1 = tf.transpose(re_conv1,perm=[0,3,1,2])
+        re_conv2 = tf.reshape(conv2, shape=[-1, n_nodes, 1, hide_s[0]])
+        re_conv2 = tf.transpose(re_conv2, perm=[0, 3, 2, 1])
+        # re_conv2 = tf.reshape(conv2, shape=[-1, 1, n_nodes])
+        add1 = re_conv1 + re_conv2
+
+        add1 = tf.transpose(add1, perm=[0,2,3,1])
+
+        add1 = tf.reshape(add1, shape=[-1, n_nodes, hide_s[0], 1])
+        conv1 = tf.layers.conv2d(add1, hide_s[1], kernel_size=[n_nodes, hide_s[0]], activation=activation)
+        conv2 = tf.layers.conv2d(add1, hide_s[1], kernel_size=[n_nodes, hide_s[0]], activation=activation)
+        re_conv1 = tf.reshape(conv1, shape=[-1, n_nodes, 1, hide_s[1]])
+        re_conv1 = tf.transpose(re_conv1,perm=[0,3,1,2])
+        re_conv2 = tf.reshape(conv2, shape=[-1, n_nodes, 1, hide_s[1]])
+        re_conv2 = tf.transpose(re_conv2, perm=[0, 3, 2, 1])
+        add2 = re_conv1 + re_conv2
+
+        add2 = tf.transpose(add2, perm=[0, 2, 3, 1])
+
+        # e2n
+        add2 = tf.reshape(add2, shape=[-1, n_nodes, hide_s[1], 1])
+        conv1 = tf.layers.conv2d(add2, hide_s[2], kernel_size=[n_nodes, hide_s[1]], activation=activation)
+
+        # n2g
+        add3 = tf.reshape(conv1, shape=[-1, n_nodes, hide_s[2], 1])
+        conv1 = tf.layers.conv2d(add3, hide_s[3], kernel_size=[n_nodes, hide_s[2]], activation=activation)
+        fc1 = tf.reshape(conv1, shape=[-1, hide_s[3]])
+
+        # fc
+        fc2 = tf.layers.dense(fc1, hide_s[4], activation=activation)
+        if training == True:
+            fc2 = tf.nn.dropout(fc2, 0.5)
+        fc3 = tf.layers.dense(fc2, hide_s[5], activation=activation)
+        if training == True:
+            fc3 = tf.nn.dropout(fc3, 0.5)
+        # fc4 = tf.layers.dense(fc3, 2, activation=activation)
+
+        return fc3
+
+    def BNCNN_loss(logits, labels):
+        # sample_wts = tf.reduce_sum(tf.multiply(tf.one_hot(labels, nb_classes), class_weights), axis=-1)
+        # xentropy = tf.multiply(tf.nn.sparse_softmax_cross_entropy_with_logits(
+        #         labels=labels, logits=logits), sample_wts)
+        # return tf.reduce_mean(xentropy, name='xentropy_mean')
+
+        classify_loss = tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels)
+        # Recons_loss = tf.reduce_sum(Recons_loss,axis=1)
+        return tf.reduce_mean(classify_loss)
+
+
+    def BNCNN_training(loss, lr):
+        # weight decay
+        vars = tf.trainable_variables()
+
+        # optimizer
+        opt = tf.train.AdamOptimizer(learning_rate=lr)
+
+        # training op
+        train_op = opt.minimize(loss)
+
+        return train_op
+
+    def BNCNN_accuracy(preds, labels):
+        correct_prediction = tf.equal(tf.argmax(preds, 1), tf.argmax(labels, 1))
+        accuracy_all = tf.cast(correct_prediction, tf.float32)
+        return tf.reduce_mean(accuracy_all)
+
+
+
 
