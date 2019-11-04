@@ -47,14 +47,14 @@ def load_data(dataset_str): # {'pubmed', 'citeseer', 'cora'}
     names = ['x', 'y', 'tx', 'ty', 'allx', 'ally', 'graph']
     objects = []
     for i in range(len(names)):
-        with open("data/ind.{}.{}".format(dataset_str, names[i]), 'rb') as f:
+        with open("../data/ind.{}.{}".format(dataset_str, names[i]), 'rb') as f:
             if sys.version_info > (3, 0):
                 objects.append(pkl.load(f, encoding='latin1'))
             else:
                 objects.append(pkl.load(f))
 
     x, y, tx, ty, allx, ally, graph = tuple(objects)
-    test_idx_reorder = parse_index_file("data/ind.{}.test.index".format(dataset_str))
+    test_idx_reorder = parse_index_file("../data/ind.{}.test.index".format(dataset_str))
     test_idx_range = np.sort(test_idx_reorder)
 
     if dataset_str == 'citeseer':
@@ -186,3 +186,7 @@ def preprocess_adj_bias(adj):
     indices = np.vstack((adj.col, adj.row)).transpose()  # This is where I made a mistake, I used (adj.row, adj.col) instead
     # return tf.SparseTensor(indices=indices, values=adj.data, dense_shape=adj.shape)
     return indices, adj.data, adj.shape
+
+if __name__ == '__main__':
+    adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask=load_data('cora')
+    print('Read Done !')

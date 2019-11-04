@@ -99,3 +99,11 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+#####################################3
+#my data
+Data_BNF/
+Result/
+node2vec-master/
+tBNE/
+array.mat
